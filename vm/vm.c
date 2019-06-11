@@ -27,6 +27,9 @@ opcode_info opcodes_table[] = {
         {"SUB",      0},
         {"MULT",     0},
         {"DIV",      0},
+        {"AND",      0},
+        {"OR",       0},
+        {"NOT",      0},
         {"COMPARE",  1},
         {"JUMP",     1},
         {"JUMP_YES", 1},
@@ -234,6 +237,20 @@ int vm_run_command() {
             } else {
                 vm_push(vm_pop() / data);
             }
+            break;
+
+        case AND:
+            data = vm_pop();
+            vm_push(vm_pop() & data);
+            break;
+
+        case OR:
+            data = vm_pop();
+            vm_push(vm_pop() | data);
+            break;
+
+        case NOT:
+            vm_push(~vm_pop());
             break;
 
         case COMPARE:

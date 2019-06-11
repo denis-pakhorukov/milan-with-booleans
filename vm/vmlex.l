@@ -37,6 +37,9 @@ ADD             { return T_ADD;      }
 SUB             { return T_SUB;      }
 MULT            { return T_MULT;     }
 DIV             { return T_DIV;      }
+AND             { return T_AND;      }
+OR              { return T_OR;       }
+NOT             { return T_NOT;      }
 COMPARE         { return T_COMPARE;  }
 JUMP            { return T_JUMP;     }
 JUMP_YES        { return T_JUMP_YES; }

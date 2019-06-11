@@ -59,6 +59,18 @@ void Command::print(int address, ostream &os) {
             os << "INVERT";
             break;
 
+        case AND:
+            os << "AND";
+            break;
+
+        case OR:
+            os << "OR";
+            break;
+
+        case NOT:
+            os << "NOT";
+            break;
+
         case COMPARE:
             os << "COMPARE\t" << arg_;
             break;

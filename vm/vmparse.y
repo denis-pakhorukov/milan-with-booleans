@@ -25,6 +25,9 @@ void yyerror(char const *);
 %token T_SUB
 %token T_MULT
 %token T_DIV
+%token T_AND
+%token T_OR
+%token T_NOT
 %token T_COMPARE
 %token T_JUMP
 %token T_JUMP_YES
@@ -53,6 +56,9 @@ line            : T_INT T_COLON T_NOP                    { put_command($1, NOP, 
                 | T_INT T_COLON T_SUB                    { put_command($1, SUB,      0);  }
                 | T_INT T_COLON T_MULT                   { put_command($1, MULT,     0);  }
                 | T_INT T_COLON T_DIV                    { put_command($1, DIV,      0);  }
+                | T_INT T_COLON T_AND                    { put_command($1, AND,      0);  }
+                | T_INT T_COLON T_OR                     { put_command($1, OR,       0);  }
+                | T_INT T_COLON T_NOT                    { put_command($1, NOT,      0);  }
                 | T_INT T_COLON T_COMPARE   T_INT        { put_command($1, COMPARE,  $4); }
                 | T_INT T_COLON T_JUMP      T_INT        { put_command($1, JUMP,     $4); }
                 | T_INT T_COLON T_JUMP_YES  T_INT        { put_command($1, JUMP_YES, $4); }
