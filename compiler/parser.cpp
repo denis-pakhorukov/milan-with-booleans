@@ -100,8 +100,8 @@ void Parser::expression() {
         int jumpYesAddress = codegen_->reserve();
         next();
         orExpression();
-        codegen_->emitAt(dupAddress, DUP);
         codegen_->emit(OR);
+        codegen_->emitAt(dupAddress, DUP);
         codegen_->emitAt(jumpYesAddress, JUMP_YES, codegen_->getCurrentAddress());
         codegen_->emit(PUSH, 0);
         codegen_->emit(COMPARE, C_NE);
@@ -111,15 +111,20 @@ void Parser::expression() {
 void Parser::orExpression() {
     andExpression();
     while (see(T_LOGICALANDOP)) {
+        // Так как побитовое И может дать 0 даже если два операнда ненулевые
+        // (в отличии от ИЛИ, которое дает ноль только когда все биты равны нулю)
+        // нам необходимо привести каждое из чисел-операндов в 0 или 1.
+        codegen_->emit(PUSH, 0);
+        codegen_->emit(COMPARE, C_NE);
         int dupAddress = codegen_->reserve();
         int jumpNoAddress = codegen_->reserve();
         next();
         andExpression();
-        codegen_->emitAt(dupAddress, DUP);
-        codegen_->emit(AND);
-        codegen_->emitAt(jumpNoAddress, JUMP_NO, codegen_->getCurrentAddress());
         codegen_->emit(PUSH, 0);
         codegen_->emit(COMPARE, C_NE);
+        codegen_->emit(AND);
+        codegen_->emitAt(dupAddress, DUP);
+        codegen_->emitAt(jumpNoAddress, JUMP_NO, codegen_->getCurrentAddress());
     }
 }
 
