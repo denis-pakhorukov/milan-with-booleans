@@ -51,13 +51,18 @@ private:
     typedef map<string, int> VarTable;
 
     // Описание блоков.
-    void program();       // Разбор программы. BEGIN statementList END
-    void statementList(); // Разбор списка операторов.
-    void statement();     // Разбор оператора.
-    void expression();    // Разбор арифметического выражения.
-    void term();          // Разбор слагаемого.
-    void factor();        // Разбор множителя.
-    void relation();      // Разбор условия.
+    void program();               // Разбор программы. BEGIN statementList END
+    void statementList();         // Разбор списка операторов.
+    void statement();             // Разбор оператора.
+    void expression();            // Разбор выражения.
+    void orExpression();          // Разбор операндов логического или
+    void andExpression();         // Разбор операндов логического и
+    void bitwiseOrExpression();   // Разбор операндов побитового или
+    void bitwiseAndExpression();  // Разбор операндов побитового и
+    void equalityExpression();    // Разбор левой и правой частей сравнения на равенство (и неравенство)
+    void relationalExpression();  // Разбор левой и правой частей отношения (<, <=, >, >=)
+    void term();                  // Разбор слагаемого.
+    void factor();                // Разбор множителя.
 
     // Сравнение текущей лексемы с образцом. Текущая позиция в потоке лексем не изменяется.
     bool see(Token t) {

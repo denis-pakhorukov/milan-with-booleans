@@ -48,7 +48,7 @@ void Parser::statement() {
         // Затем зарезервируем место для условного перехода JUMP_NO к блоку ELSE (переход в случае ложного условия). Адрес перехода
         // станет известным только после того, как будет сгенерирован код для блока THEN.
     else if (match(T_IF)) {
-        relation();
+        expression();
 
         int jumpNoAddress = codegen_->reserve();
 
@@ -73,7 +73,7 @@ void Parser::statement() {
     } else if (match(T_WHILE)) {
         // Запоминаем адрес начала проверки условия.
         int conditionAddress = codegen_->getCurrentAddress();
-        relation();
+        expression();
         // Резервируем место под инструкцию условного перехода для выхода из цикла.
         int jumpNoAddress = codegen_->reserve();
         mustBe(T_DO);
@@ -94,6 +94,82 @@ void Parser::statement() {
 }
 
 void Parser::expression() {
+    orExpression();
+    while (see(T_LOGICALOROP)) {
+        int dupAddress = codegen_->reserve();
+        int jumpYesAddress = codegen_->reserve();
+        next();
+        orExpression();
+        codegen_->emitAt(dupAddress, DUP);
+        codegen_->emit(OR);
+        codegen_->emitAt(jumpYesAddress, JUMP_YES, codegen_->getCurrentAddress());
+        codegen_->emit(PUSH, 0);
+        codegen_->emit(COMPARE, C_NE);
+    }
+}
+
+void Parser::orExpression() {
+    andExpression();
+    while (see(T_LOGICALANDOP)) {
+        int dupAddress = codegen_->reserve();
+        int jumpNoAddress = codegen_->reserve();
+        next();
+        andExpression();
+        codegen_->emitAt(dupAddress, DUP);
+        codegen_->emit(AND);
+        codegen_->emitAt(jumpNoAddress, JUMP_NO, codegen_->getCurrentAddress());
+        codegen_->emit(PUSH, 0);
+        codegen_->emit(COMPARE, C_NE);
+    }
+}
+
+void Parser::andExpression() {
+    bitwiseOrExpression();
+    while (see(T_BITWISEOROP)) {
+        next();
+        bitwiseOrExpression();
+        codegen_->emit(OR);
+    }
+}
+
+void Parser::bitwiseOrExpression() {
+    bitwiseAndExpression();
+    while (see(T_BITWISEANDOP)) {
+        next();
+        bitwiseAndExpression();
+        codegen_->emit(AND);
+    }
+}
+
+void Parser::bitwiseAndExpression() {
+    equalityExpression();
+    while (see(T_CMP)) {
+        Cmp cmp = scanner_->getCmpValue();
+        if (cmp == C_EQ || cmp == C_NE) {
+            next();
+            equalityExpression();
+            codegen_->emit(COMPARE, cmp);
+        } else {
+            break;
+        }
+    }
+}
+
+void Parser::equalityExpression() {
+    relationalExpression();
+    while (see(T_CMP)) {
+        Cmp cmp = scanner_->getCmpValue();
+        if (cmp == C_LT || cmp == C_LE || cmp == C_GT || cmp == C_GE) {
+            next();
+            relationalExpression();
+            codegen_->emit(COMPARE, cmp);
+        } else {
+            break;
+        }
+    }
+}
+
+void Parser::relationalExpression() {
     // Арифметическое выражение описывается следующими правилами: <expression> -> <term> | <term> + <term> | <term> - <term>
     // При разборе сначала смотрим первый терм, затем анализируем очередной символ. Если это '+' или '-',
     // удаляем его из потока и разбираем очередное слагаемое (вычитаемое). Повторяем проверку и разбор очередного
@@ -147,11 +223,22 @@ void Parser::factor() {
         next();
         codegen_->emit(LOAD, varAddress);
         // Если встретили переменную, то выгружаем значение, лежащее по ее адресу, на вершину стека
+    } else if (see(T_TRUE)) {
+        next();
+        codegen_->emit(PUSH, 1);
+    } else if (see(T_FALSE)) {
+        next();
+        codegen_->emit(PUSH, 0);
     } else if (see(T_ADDOP) && scanner_->getArithmeticValue() == A_MINUS) {
         next();
         factor();
         codegen_->emit(INVERT);
         // Если встретили знак "-", и за ним <factor> то инвертируем значение, лежащее на вершине стека
+    } else if (see(T_LOGICALNOTOP)) {
+        next();
+        factor();
+        codegen_->emit(PUSH, 0);
+        codegen_->emit(COMPARE, C_EQ);
     } else if (match(T_LPAREN)) {
         expression();
         mustBe(T_RPAREN);
@@ -162,20 +249,6 @@ void Parser::factor() {
         // Если встретили зарезервированное слово READ, то записываем на вершину стека идет запись со стандартного ввода
     } else {
         reportError("expression expected.");
-    }
-}
-
-void Parser::relation() {
-    // Условие сравнивает два выражения по какому-либо из знаков. Каждый знак имеет свой номер.
-    // В зависимости от результата сравнения на вершине стека окажется 0 или 1.
-    expression();
-    if (see(T_CMP)) {
-        Cmp cmp = scanner_->getCmpValue();
-        next();
-        expression();
-        codegen_->emit(COMPARE, cmp);
-    } else {
-        reportError("comparison operator expected.");
     }
 }
 

@@ -23,9 +23,16 @@ enum Token {
     T_OD,           // Ключевое слово "od"
     T_WRITE,        // Ключевое слово "write"
     T_READ,         // Ключевое слово "read"
+    T_FALSE,        // Ключевое слово "false"
+    T_TRUE,         // Ключевое слово "true"
     T_ASSIGN,       // Оператор ":="
     T_ADDOP,        // Сводная лексема для "+" и "-" (операция типа сложения)
     T_MULOP,        // Сводная лексема для "*" и "/" (операция типа умножения)
+    T_BITWISEANDOP, // Лексема для "&" (побитовое И)
+    T_BITWISEOROP,  // Лексема для "|" (побитовое ИЛИ)
+    T_LOGICALANDOP, // Лексема для "&&" (логическое И)
+    T_LOGICALOROP,  // Лексема для "||" (побитовое ИЛИ)
+    T_LOGICALNOTOP, // Лексема для "!" (логическое НЕ)
     T_CMP,          // Сводная лексема для операторов отношения
     T_LPAREN,       // Открывающая скобка
     T_RPAREN,       // Закрывающая скобка
@@ -70,6 +77,8 @@ public:
         keywords_["while"] = T_WHILE;
         keywords_["do"] = T_DO;
         keywords_["od"] = T_OD;
+        keywords_["false"] = T_FALSE;
+        keywords_["true"] = T_TRUE;
         keywords_["write"] = T_WRITE;
         keywords_["read"] = T_READ;
 

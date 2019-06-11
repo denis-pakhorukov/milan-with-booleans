@@ -21,9 +21,16 @@ static const char *tokenNames_[] = {
         "'OD'",
         "'WRITE'",
         "'READ'",
+        "'false'",
+        "'true'",
         "':='",
         "'+' or '-'",
         "'*' or '/'",
+        "'&'",
+        "'|'",
+        "'&&'",
+        "'||'",
+        "'!'",
         "comparison operator",
         "'('",
         "')'",
@@ -161,8 +168,8 @@ void Scanner::nextToken() {
                     cmpValue_ = C_GT;
                 }
                 break;
-                // Если встретим "!", то дальше должно быть "=", тогда считаем, что получили лексему сравнения
-                // и знак "!=" иначе считаем, что у нас лексема ошибки
+                // Если встретим "!" и за ним "=", то считаем, что получили лексему сравнения
+                // и знак "!=" иначе считаем, что у нас лексема логической операции НЕ.
             case '!':
                 nextChar();
                 if (ch_ == '=') {
@@ -170,7 +177,7 @@ void Scanner::nextToken() {
                     token_ = T_CMP;
                     cmpValue_ = C_NE;
                 } else {
-                    token_ = T_ILLEGAL;
+                    token_ = T_LOGICALNOTOP;
                 }
                 break;
                 // Если встретим "=" - лексема сравнения и знак "="
@@ -198,8 +205,28 @@ void Scanner::nextToken() {
                 arithmeticValue_ = A_MULTIPLY;
                 nextChar();
                 break;
-                // Иначе лексема ошибки.
-            default:
+
+            case '&':
+                nextChar();
+                if (ch_ == '&') {
+                    nextChar();
+                    token_ = T_LOGICALANDOP;
+                } else {
+                    token_ = T_BITWISEANDOP;
+                }
+                break;
+
+            case '|':
+                nextChar();
+                if (ch_ == '|') {
+                    nextChar();
+                    token_ = T_LOGICALOROP;
+                } else {
+                    token_ = T_BITWISEOROP;
+                }
+                break;
+
+            default: // Иначе лексема ошибки.
                 token_ = T_ILLEGAL;
                 nextChar();
                 break;
