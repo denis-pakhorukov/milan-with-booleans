@@ -1,0 +1,58 @@
+BEGIN
+    a := 10;
+    b := 20;
+    c := 30;
+    d := 40;
+
+    e1 := (a) = (b);
+    e2 := (a * b) + c;
+    e3 := a * b + c;
+    e4 := a*(b+c);
+    e5 := (a+b) > c;
+    e6 := a + b > c;
+    e7 := a+(b>c);
+    e8 := a + b > c;
+    e9 := (a > b) = (b > c);
+    e10 := a > b = b > c;
+    e11 := (a = b) > (b = c);
+    e12 := a = b > b = c;
+    e13 := (a != b) && (c <= d);
+    e14 := a != b && c <= d;
+    e15 := (a > b) && (c || d);
+    e16 := a > b && c || d;
+    e17 := (a = b) && c;
+    e18 := a = b && c;
+    e19 := !(a+b) || !(b+1 | 1 + c);
+    e20 := (a - (b | d) | b & c | d | c + d & a);
+    e21 := (((((5 <= a <= 8)))));
+    e22 := (true & true);
+    e23 := (!(a <= b) || c > 4);
+    e24 := (!a | 8 || b + 5);
+    e25 := !(a && b) && (!READ || b) && (!b || b);
+
+    write(e1 = 0);
+    write(e2 = 230);
+    write(e3 = 230);
+    write(e4 = 500);
+    write(e5 = 0);
+    write(e6 = 0);
+    write(e7 = 10);
+    write(e8 = 0);
+    write(e9 = 1);
+    write(e10 = 1);
+    write(e11 = 0);
+    write(e12 = 0);
+    write(e13 = 1);
+    write(e14 = 1);
+    write(e15 = 0);
+    write(e16 = 1);
+    write(e17 = 0);
+    write(e18 = 0);
+    write(e19 = 0);
+    write(e20 = -2);
+    write(e21 = 1);
+    write(e22 = 1);
+    write(e23 = 1);
+    write(e24 = 1);
+    write(e25 = 0)
+END
